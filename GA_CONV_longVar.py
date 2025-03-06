@@ -6,6 +6,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import numpy as np
 import random
 import os
+from datos import *
 #No sacar mensajes
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
@@ -13,9 +14,11 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 evaluaciones_cache = {}
 
 # Parametros
+'''
 epochs_v=5
 tamano_poblacion_v = 5
 generaciones_v = 5
+'''
 
 # Definir función para crear un modelo CNN con un número variable de capas
 def crear_modelo(individuo):
@@ -157,8 +160,8 @@ def validar_poblacion(hijo):
 train_datagen = ImageDataGenerator(rescale=1./255)
 val_datagen = ImageDataGenerator(rescale=1./255)
 
-train_gen = train_datagen.flow_from_directory('C:/Users/W10/chest_xray/train1', target_size=(150, 150), batch_size=32, class_mode='binary')
-val_gen = val_datagen.flow_from_directory('C:/Users/W10/chest_xray/val', target_size=(150, 150), batch_size=32, class_mode='binary')
+train_gen = train_datagen.flow_from_directory(train_dir, target_size=(150, 150), batch_size=32, class_mode='binary')
+val_gen = val_datagen.flow_from_directory(test_dir, target_size=(150, 150), batch_size=32, class_mode='binary')
 
 # Ejecutar optimización
 #tamano_poblacion = 10
