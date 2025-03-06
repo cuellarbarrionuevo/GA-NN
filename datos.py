@@ -1,4 +1,4 @@
-#Direcciones
+#Direcciones.
 train_dir ='C:/Users/W10/chest_xray/train1'
 test_dir = 'C:/Users/W10/chest_xray/val'
 
