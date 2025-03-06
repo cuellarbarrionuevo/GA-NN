@@ -8,7 +8,7 @@ import numpy as np
 import random
 
 
-# Definir función para crear un modelo CNN
+# Definir función para crear un modelo CNN.
 
 def crear_modelo(filtros, kernel_size, dropout_rate, dense_neuronas, activacion):
     model = Sequential([
