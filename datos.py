@@ -1,8 +1,8 @@
 #Direcciones.
-train_dir ='C:/Users/W10/chest_xray/train1'
-test_dir = 'C:/Users/W10/chest_xray/val'
+train_dir ='D:/Python_papa/chest_xray/train'
+test_dir = 'D:/Python_papa/chest_xray/test'
 
 # Parametros
-epochs_v=5
-tamano_poblacion_v = 5
-generaciones_v = 5
+epochs_v=10
+tamano_poblacion_v = 10
+generaciones_v = 10
