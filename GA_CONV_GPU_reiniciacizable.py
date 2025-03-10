@@ -153,7 +153,7 @@ def evolucionar(poblacion, generaciones, train_gen, val_gen):
         start_time = end_time
         end_time = time.time()
         elapsed_time = end_time - start_time
-        print("Evolución",str(_), f"Tiempo transcurrido: {elapsed_time:.2f} segundos", "Numero de poblacion explorado: ",len(evaluaciones_cache))
+        print("Generacion",str(_), f"Tiempo transcurrido: {elapsed_time:.2f} segundos", "Numero de poblacion explorado: ",len(evaluaciones_cache))
         seleccionados = seleccion(poblacion, train_gen, val_gen)
         nueva_poblacion = seleccionados[:]
         while len(nueva_poblacion) < len(poblacion):
@@ -188,7 +188,7 @@ tamano_poblacion = tamano_poblacion_v
 generaciones = generaciones_v
 
 # si existe un ejecucion previa continuamos
-fichero_backup = f"{train_dir.replace('/', '-')[:5]}_{test_dir.replace('/', '-')[:5]}.pkl"
+fichero_backup = f"{train_dir.replace('/', '-')[-5:]}_{test_dir.replace('/', '-')[-5:]}.pkl"
 if os.path.exists(fichero_backup):
     # Si el archivo existe, lo cargamos
     with open(fichero_backup, 'rb') as file:
@@ -203,12 +203,14 @@ else:
 mejor_modelo = evolucionar(poblacion, generaciones, train_gen, val_gen)
 print("Mejor configuración encontrada:", mejor_modelo)
 
-print(evaluaciones_cache)
+#print(evaluaciones_cache)
 # Imprimir solo los valores de accuracy
 for valor in evaluaciones_cache.values():
     print(valor)
 #Guardamos los datos claves poblaciones y diccionario
-with open(f"{train_dir.replace('/', '-')[:5]}_{test_dir.replace('/', '-')[:5]}.pkl", 'wb') as file:
+print(fichero_backup)
+with open(fichero_backup, 'wb') as file:
+    print("estoy dentro")
     pickle.dump(poblacion[:len(poblacion)//2], file) #Guardamos los mejores de la ultima evolucion
     #pickle.dump(poblacion[:len(poblacion)], file) #Guardamos los mejores de la ultima evolucion
     pickle.dump(evaluaciones_cache, file)
