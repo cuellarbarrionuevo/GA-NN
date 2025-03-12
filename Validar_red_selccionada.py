@@ -10,6 +10,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report,confusion_matrix
 import cv2
 import os
+import pickle
+import ast
+
 
 labels = ['PNEUMONIA', 'NORMAL']
 img_size = 150
@@ -28,6 +31,41 @@ def get_training_data(data_dir):
     return (data)            
     #return np.array(data)
 
+# Definir función para crear un modelo CNN con un número variable de capas
+def crear_modelo(individuo):
+    #########################################
+    #print(individuo)
+    #########################################
+    model = Sequential()
+    model.add(Conv2D(individuo["filtros"][0], kernel_size=individuo["kernel_size"][0], activation='relu', input_shape=(150, 150, 1),padding='same'))
+    model.add(MaxPooling2D(pool_size=individuo["max_pooling"][0]))
+    
+    for i in range(1, len(individuo["filtros"])):
+        model.add(Conv2D(individuo["filtros"][i], kernel_size=individuo["kernel_size"][i], activation='relu',padding='same'))
+        model.add(MaxPooling2D(pool_size=individuo["max_pooling"][i]))
+    
+    model.add(Flatten())
+    
+    for i in range(len(individuo["densa"])):
+        model.add(Dense(individuo["densa"][i], activation=individuo["activacion"]))
+        model.add(Dropout(individuo["dropout_rate"][i]))
+    
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+    return model
+
+def selec_ind_pobla_hist():
+# si existe un ejecucion previa continuamos
+    fichero_backup = f"{train_dir.replace('/', '-')[-5:]}_{test_dir.replace('/', '-')[-5:]}.pkl"
+    if os.path.exists(fichero_backup):
+        # Si el archivo existe, lo cargamos
+        with open(fichero_backup, 'rb') as file:
+            poblacion = pickle.load(file)
+            evaluaciones_cache = pickle.load(file)
+            mejor_clave = max(evaluaciones_cache, key=lambda k: evaluaciones_cache[k][0])
+            return ast.literal_eval(evaluaciones_cache[mejor_clave][1]) #convertimos a diccionario el codigo de la red,q ue viene en texto
+    else:
+            return({'filtros': [32, 64, 32], 'kernel_size': [(5, 5), (3, 3), (5, 5)], 'max_pooling': [(3, 3), (2, 2), (2, 2)], 'dropout_rate': [0.5, 0.5, 0.2], 'densa': [256, 128, 128], 'activacion': 'relu'})
 #Loading dataset
 
 from datos import *
@@ -176,6 +214,9 @@ model.add(Dense(128, activation='tanh'))
 model.add(Dropout(0.2))
 model.add(Dense(1, activation='sigmoid'))
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+'''
+model = crear_modelo(selec_ind_pobla_hist())
+'''''
 # Model summary
 model.summary()
 
@@ -229,4 +270,3 @@ cm = pd.DataFrame(cm , index = ['0','1'] , columns = ['0','1'])
 
 plt.figure(figsize = (10,10))
 sns.heatmap(cm,cmap= "Blues", linecolor = 'black' , linewidth = 1 , annot = True, fmt='',xticklabels = labels,yticklabels = labels)
-
