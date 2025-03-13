@@ -270,4 +270,3 @@ cm = pd.DataFrame(cm , index = ['0','1'] , columns = ['0','1'])
 
 plt.figure(figsize = (10,10))
 sns.heatmap(cm,cmap= "Blues", linecolor = 'black' , linewidth = 1 , annot = True, fmt='',xticklabels = labels,yticklabels = labels)
-

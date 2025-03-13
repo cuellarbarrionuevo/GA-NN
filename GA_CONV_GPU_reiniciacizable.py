@@ -180,6 +180,7 @@ train_datagen = ImageDataGenerator(rescale=1./255)
 val_datagen = ImageDataGenerator(rescale=1./255)
 
 train_gen = train_datagen.flow_from_directory(train_dir, target_size=(150, 150), batch_size=32, class_mode='binary')
+#train_gen = train_datagen.flow_from_directory(train_dir, target_size=(150, 150), batch_size=32, class_mode='binary')
 val_gen = val_datagen.flow_from_directory(test_dir, target_size=(150, 150), batch_size=32, class_mode='binary')
 
 # Ejecutar optimización
@@ -211,7 +212,7 @@ for valor in evaluaciones_cache.values():
 print(fichero_backup)
 with open(fichero_backup, 'wb') as file:
     print("estoy dentro")
-    pickle.dump(poblacion[:len(poblacion)//2], file) #Guardamos los mejores de la ultima evolucion
+    pickle.dump(poblacion[:len(poblacion)], file) 
     #pickle.dump(poblacion[:len(poblacion)], file) #Guardamos los mejores de la ultima evolucion
     pickle.dump(evaluaciones_cache, file)
     pickle.dump(mejor_modelo, file)
