@@ -49,8 +49,8 @@ pivot_table = pivot_table.sort_index(axis=0)  # Ordena las filas (índices)
 pivot_table = pivot_table.sort_index(axis=1)  # Ordena las columnas
 
 # Crear heatmap
-plt.figure(figsize=(20, 12))  # Ampliar el tamaño de la figura
-plt.subplots_adjust(left=0.2, bottom=0.5, right=0.85, top=0.85)
+plt.figure(figsize=(20, 14))  # Ampliar el tamaño de la figura
+plt.subplots_adjust(left=0.2, bottom=0.4, right=0.95, top=0.95)
 sns.heatmap(pivot_table, annot=True, cmap='coolwarm', fmt='.3f', linewidths=0.5)
 plt.xlabel('Parámetros de Filtros y Kernel', fontsize=10, labelpad=20)
 plt.ylabel('Parámetros de Capas Densas', fontsize=10, labelpad=20)

@@ -12,6 +12,7 @@ import cv2
 import os
 import pickle
 import ast
+import heapq
 
 
 labels = ['PNEUMONIA', 'NORMAL']
@@ -62,7 +63,10 @@ def selec_ind_pobla_hist():
         with open(fichero_backup, 'rb') as file:
             poblacion = pickle.load(file)
             evaluaciones_cache = pickle.load(file)
-            mejor_clave = max(evaluaciones_cache, key=lambda k: evaluaciones_cache[k][0])
+            #mejor_clave = max(evaluaciones_cache, key=lambda k: evaluaciones_cache[k][0])
+            # Obtener las dos mejores claves directamente
+            mejores = heapq.nlargest(2, evaluaciones_cache.keys(), key=lambda k: evaluaciones_cache[k][0])
+            mejor_clave = mejores[1] if len(mejores) > 1 else None
             return ast.literal_eval(evaluaciones_cache[mejor_clave][1]) #convertimos a diccionario el codigo de la red,q ue viene en texto
     else:
             return({'filtros': [32, 64, 32], 'kernel_size': [(5, 5), (3, 3), (5, 5)], 'max_pooling': [(3, 3), (2, 2), (2, 2)], 'dropout_rate': [0.5, 0.5, 0.2], 'densa': [256, 128, 128], 'activacion': 'relu'})
@@ -86,7 +90,7 @@ plt.ylabel('Count')
 plt.show()  
 
 # Visualizacion
-df = pd.DataFrame(val, columns=['Image', 'Label'])
+df = pd.DataFrame(test, columns=['Image', 'Label'])
 
 df['Class'] = df['Label'].map({0: 'Pneumonia', 1: 'Normal'})
 
@@ -196,7 +200,7 @@ model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy']
 '''
 [[379  11]
  [ 46 188]]
-'''
+
 model.add(Conv2D(16, (5, 5), activation='relu', input_shape=(150, 150, 1), padding= 'same'))
 model.add(MaxPooling2D((3, 3)))
 model.add(Conv2D(16, (5, 5), activation='relu', padding= 'same'))
@@ -216,12 +220,12 @@ model.add(Dense(1, activation='sigmoid'))
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 '''
 model = crear_modelo(selec_ind_pobla_hist())
-'''''
+
 # Model summary
 model.summary()
 
 #history = model.fit(datagen.flow(x_train,y_train, batch_size = 32) ,epochs =50 , validation_data = datagen.flow(x_val, y_val) )
-history = model.fit(datagen.flow(x_train,y_train, batch_size = 32) ,epochs =50 , validation_data = datagen.flow(x_test, y_test) )
+history = model.fit(datagen.flow(x_train,y_train, batch_size = 32) ,epochs =30 , validation_data = datagen.flow(x_test, y_test) )
 
 #Analisys after modeling
 epochs = list(range(1, len(history.history['accuracy']) + 1))
@@ -270,3 +274,32 @@ cm = pd.DataFrame(cm , index = ['0','1'] , columns = ['0','1'])
 
 plt.figure(figsize = (10,10))
 sns.heatmap(cm,cmap= "Blues", linecolor = 'black' , linewidth = 1 , annot = True, fmt='',xticklabels = labels,yticklabels = labels)
+#.............................................................................
+# Imagenes mal clasificadas
+#.............................................................................
+
+# Obtener predicciones (probabilidades entre 0 y 1)
+y_pred_probs = model.predict(x_test)
+
+# Convertir probabilidades a etiquetas (0 o 1)
+y_pred = (y_pred_probs > 0.5).astype(int).flatten()  # Asegurar formato adecuado
+y_true = y_test.flatten()  # Si `y_test` está en formato 1D
+
+# Encontrar índices de imágenes mal clasificadas
+misclassified_indices = np.where(y_pred != y_true)[0]
+
+# Mostrar cuántas imágenes fueron mal clasificadas
+print(f"Total de imágenes mal clasificadas: {len(misclassified_indices)}")
+
+# Número de imágenes a visualizar
+num_images = min(80, len(misclassified_indices))
+
+plt.figure(figsize=(12, 6))
+for i, index in enumerate(misclassified_indices[:num_images]):
+    plt.subplot(16, 5, i + 1)
+    plt.imshow(x_test[index], cmap='gray')  # Asegurar escala de grises
+    plt.title(f"Real: {y_true[index]} / Pred: {y_pred[index]} / IMG: {index}")
+    plt.axis("off")
+
+plt.tight_layout()
+plt.show()
