@@ -162,8 +162,13 @@ def evolucionar(poblacion, generaciones, train_gen, val_gen):
             if validar_poblacion(hijo):
                 nueva_poblacion.append(mutar(hijo))
         poblacion = nueva_poblacion
-        #print("mejor",seleccionados[0])
-    return seleccionados[0]
+        # Guardaos la cofiguracio hasta el 
+        with open(fichero_backup, 'wb') as file:
+            pickle.dump(poblacion[:len(poblacion)], file) 
+            #pickle.dump(poblacion[:len(poblacion)], file) #Guardamos los mejores de la ultima evolucion
+            pickle.dump(evaluaciones_cache, file)
+            #pickle.dump(mejor_modelo, file)
+            #return seleccionados[0]
 
 def validar_poblacion(hijo):
     #valida que al hacer el max_pooling la imagen tiene por lo menos un tamaño de 4
@@ -211,8 +216,7 @@ for valor in evaluaciones_cache.values():
 #Guardamos los datos claves poblaciones y diccionario
 print(fichero_backup)
 with open(fichero_backup, 'wb') as file:
-    print("estoy dentro")
     pickle.dump(poblacion[:len(poblacion)], file) 
     #pickle.dump(poblacion[:len(poblacion)], file) #Guardamos los mejores de la ultima evolucion
     pickle.dump(evaluaciones_cache, file)
-    pickle.dump(mejor_modelo, file)
+    #pickle.dump(mejor_modelo, file)
